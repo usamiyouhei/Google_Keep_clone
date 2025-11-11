@@ -12,7 +12,6 @@ export default function FlashMessage() {
       <div className={`flash-message flash-message--${flashMessage.type}`}>
         <div className="flash-message__icon">
           {flashMessage.type === "error" ? <FiXCircle /> : <FiCheckCircle />}
-          <FiCheckCircle />
         </div>
         <div className="flash-message__content">{flashMessage.message}</div>
         <button className="flash-message__close" onClick={removeFlashMessage}>
