@@ -2,15 +2,38 @@ import { Link } from "react-router-dom";
 import "./Signup.css";
 import { useState } from "react";
 import { authRepository } from "../../modules/auth/auth.repository";
+import { useUIStore } from "../../modules/ui/ui.store";
 
 export default function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { addFlashMessage } = useUIStore();
+  const [isLoading, setIsLoading] = useState(false);
 
   const signup = async () => {
-    const result = await authRepository.signup(name, email, password);
-    console.log(result);
+    if (!name || !email || !password) {
+      addFlashMessage("すべての項目を入力してください", "error");
+      return;
+    }
+
+    if (password.length < 8) {
+      addFlashMessage("パスワードは8文字以上にしてください", "error");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const result = await authRepository.signup(name, email, password);
+      console.log(result);
+      addFlashMessage("アカウント作成しました", "success");
+    } catch (error) {
+      console.error(error);
+      addFlashMessage("アカウント作成に失敗しました", "error");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -78,6 +101,7 @@ export default function Signup() {
               type="button"
               className="btn btn-primary signup-submit-btn"
               onClick={signup}
+              disabled={isLoading}
             >
               アカウント作成
             </button>
