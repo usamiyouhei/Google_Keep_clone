@@ -32,6 +32,7 @@ export default function Signup() {
         email,
         password
       );
+      localStorage.setItem("token", token);
       setCurrentUser(user);
       addFlashMessage("アカウント作成しました", "success");
     } catch (error) {
