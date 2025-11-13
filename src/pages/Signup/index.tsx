@@ -1,8 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import "./Signup.css";
 import { useState } from "react";
 import { authRepository } from "../../modules/auth/auth.repository";
 import { useUIStore } from "../../modules/ui/ui.store";
+import { useCurrentUserStore } from "../../modules/auth/current-user.store";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -10,6 +11,7 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const { addFlashMessage } = useUIStore();
   const [isLoading, setIsLoading] = useState(false);
+  const { currentUser, setCurrentUser } = useCurrentUserStore();
 
   const signup = async () => {
     if (!name || !email || !password) {
@@ -25,8 +27,12 @@ export default function Signup() {
     setIsLoading(true);
 
     try {
-      const result = await authRepository.signup(name, email, password);
-      console.log(result);
+      const { user, token } = await authRepository.signup(
+        name,
+        email,
+        password
+      );
+      setCurrentUser(user);
       addFlashMessage("アカウント作成しました", "success");
     } catch (error) {
       console.error(error);
@@ -35,6 +41,8 @@ export default function Signup() {
       setIsLoading(false);
     }
   };
+
+  if (currentUser) return <Navigate to="/" />;
 
   return (
     <div className="signup-page">
