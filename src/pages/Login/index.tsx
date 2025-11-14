@@ -21,6 +21,7 @@ export default function Login() {
     setIsLoading(true);
     try {
       const { user, token } = await authRepository.signin(email, password);
+      localStorage.setItem("token", token);
       setCurrentUser(user);
       // console.log(result);
       addFlashMessage("ログインしました", "success");
