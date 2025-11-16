@@ -1,6 +1,10 @@
-import { FiTag, FiPlus, FiX } from 'react-icons/fi';
+import { useState } from "react";
+import { FiTag, FiPlus, FiX } from "react-icons/fi";
+import LabelModal from "../../components/LabelModal";
 
 export default function LabelSidebar() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <>
       <aside className="label-sidebar">
@@ -11,7 +15,7 @@ export default function LabelSidebar() {
           </h3>
           <button
             className="icon-btn label-sidebar__add-btn"
-            onClick={() => {}}
+            onClick={() => setIsModalOpen(true)}
           >
             <FiPlus />
           </button>
@@ -22,14 +26,11 @@ export default function LabelSidebar() {
             <div className="label-sidebar__label-btn">
               <span
                 className="label-sidebar__label-color"
-                style={{ backgroundColor: '#2196f3' }}
+                style={{ backgroundColor: "#2196f3" }}
               ></span>
               <span className="label-sidebar__label-name">仕事</span>
             </div>
-            <button
-              className="label-sidebar__delete-btn"
-              onClick={() => {}}
-            >
+            <button className="label-sidebar__delete-btn" onClick={() => {}}>
               <FiX />
             </button>
           </li>
@@ -37,14 +38,11 @@ export default function LabelSidebar() {
             <div className="label-sidebar__label-btn">
               <span
                 className="label-sidebar__label-color"
-                style={{ backgroundColor: '#4caf50' }}
+                style={{ backgroundColor: "#4caf50" }}
               ></span>
               <span className="label-sidebar__label-name">重要</span>
             </div>
-            <button
-              className="label-sidebar__delete-btn"
-              onClick={() => {}}
-            >
+            <button className="label-sidebar__delete-btn" onClick={() => {}}>
               <FiX />
             </button>
           </li>
@@ -52,14 +50,11 @@ export default function LabelSidebar() {
             <div className="label-sidebar__label-btn">
               <span
                 className="label-sidebar__label-color"
-                style={{ backgroundColor: '#f44336' }}
+                style={{ backgroundColor: "#f44336" }}
               ></span>
               <span className="label-sidebar__label-name">緊急</span>
             </div>
-            <button
-              className="label-sidebar__delete-btn"
-              onClick={() => {}}
-            >
+            <button className="label-sidebar__delete-btn" onClick={() => {}}>
               <FiX />
             </button>
           </li>
@@ -67,14 +62,11 @@ export default function LabelSidebar() {
             <div className="label-sidebar__label-btn">
               <span
                 className="label-sidebar__label-color"
-                style={{ backgroundColor: '#ffc107' }}
+                style={{ backgroundColor: "#ffc107" }}
               ></span>
               <span className="label-sidebar__label-name">個人</span>
             </div>
-            <button
-              className="label-sidebar__delete-btn"
-              onClick={() => {}}
-            >
+            <button className="label-sidebar__delete-btn" onClick={() => {}}>
               <FiX />
             </button>
           </li>
@@ -82,7 +74,7 @@ export default function LabelSidebar() {
       </aside>
 
       {/* モーダル表示 - コメントアウトを切り替えて表示/非表示を変更 */}
-      {/* <LabelModal /> */}
+      {isModalOpen && <LabelModal />}
     </>
   );
 }
