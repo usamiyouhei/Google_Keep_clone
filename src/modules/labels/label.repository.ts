@@ -10,4 +10,7 @@ export const labelRepository = {
     const result = await api.get("/labels");
     return result.data.map((label: Label) => new Label(label));
   },
+  async deleteLabel(id: string): Promise<void> {
+    await api.delete(`/labels/${id}`);
+  },
 };
