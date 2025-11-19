@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiTag, FiPlus, FiX } from "react-icons/fi";
 import LabelModal from "../../components/LabelModal";
 import { useUIStore } from "../../modules/ui/ui.store";
@@ -8,7 +8,21 @@ import { useLabelStore } from "../../modules/labels/label.store";
 export default function LabelSidebar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { addFlashMessage } = useUIStore();
-  const { addLabel } = useLabelStore();
+  const { addLabel, setLabels, labels } = useLabelStore();
+
+  useEffect(() => {
+    fetchLabels();
+  }, []);
+
+  const fetchLabels = async () => {
+    try {
+      const labels = await labelRepository.getLabels();
+      setLabels(labels);
+    } catch (error) {
+      console.error(error);
+      addFlashMessage("ラベルの取得に失敗しました", "error");
+    }
+  };
 
   const createLabel = async (name: string, color: string) => {
     try {
@@ -39,54 +53,20 @@ export default function LabelSidebar() {
         </div>
 
         <ul className="label-sidebar__list">
-          <li className="label-sidebar__item">
-            <div className="label-sidebar__label-btn">
-              <span
-                className="label-sidebar__label-color"
-                style={{ backgroundColor: "#2196f3" }}
-              ></span>
-              <span className="label-sidebar__label-name">仕事</span>
-            </div>
-            <button className="label-sidebar__delete-btn" onClick={() => {}}>
-              <FiX />
-            </button>
-          </li>
-          <li className="label-sidebar__item">
-            <div className="label-sidebar__label-btn">
-              <span
-                className="label-sidebar__label-color"
-                style={{ backgroundColor: "#4caf50" }}
-              ></span>
-              <span className="label-sidebar__label-name">重要</span>
-            </div>
-            <button className="label-sidebar__delete-btn" onClick={() => {}}>
-              <FiX />
-            </button>
-          </li>
-          <li className="label-sidebar__item">
-            <div className="label-sidebar__label-btn">
-              <span
-                className="label-sidebar__label-color"
-                style={{ backgroundColor: "#f44336" }}
-              ></span>
-              <span className="label-sidebar__label-name">緊急</span>
-            </div>
-            <button className="label-sidebar__delete-btn" onClick={() => {}}>
-              <FiX />
-            </button>
-          </li>
-          <li className="label-sidebar__item">
-            <div className="label-sidebar__label-btn">
-              <span
-                className="label-sidebar__label-color"
-                style={{ backgroundColor: "#ffc107" }}
-              ></span>
-              <span className="label-sidebar__label-name">個人</span>
-            </div>
-            <button className="label-sidebar__delete-btn" onClick={() => {}}>
-              <FiX />
-            </button>
-          </li>
+          {labels.map((label) => (
+            <li key={label.id} className="label-sidebar__item">
+              <div className="label-sidebar__label-btn">
+                <span
+                  className="label-sidebar__label-color"
+                  style={{ backgroundColor: label.color }}
+                ></span>
+                <span className="label-sidebar__label-name">{label.name}</span>
+              </div>
+              <button className="label-sidebar__delete-btn" onClick={() => {}}>
+                <FiX />
+              </button>
+            </li>
+          ))}
         </ul>
       </aside>
       {isModalOpen && (

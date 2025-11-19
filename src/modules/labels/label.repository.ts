@@ -6,4 +6,8 @@ export const labelRepository = {
     const result = await api.post("/labels", { name, color });
     return new Label(result.data);
   },
+  async getLabels(): Promise<Label[]> {
+    const result = await api.get("/labels");
+    return result.data.map((label: Label) => new Label(label));
+  },
 };
