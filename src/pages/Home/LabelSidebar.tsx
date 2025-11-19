@@ -8,7 +8,7 @@ import { useLabelStore } from "../../modules/labels/label.store";
 export default function LabelSidebar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { addFlashMessage } = useUIStore();
-  const { addLabel, setLabels, labels } = useLabelStore();
+  const { addLabel, setLabels, labels, removeLabel } = useLabelStore();
 
   useEffect(() => {
     fetchLabels();
@@ -33,6 +33,17 @@ export default function LabelSidebar() {
     } catch (error) {
       console.error(error);
       addFlashMessage("ラベルの作成に失敗しました", "error");
+    }
+  };
+
+  const deleteLabel = async (labelId: string) => {
+    try {
+      await labelRepository.deleteLabel(labelId);
+      removeLabel(labelId);
+      addFlashMessage("ラベルを削除しました", "success");
+    } catch (error) {
+      console.error(error);
+      addFlashMessage("ラベルの削除に失敗しました", "error");
     }
   };
 
@@ -62,7 +73,10 @@ export default function LabelSidebar() {
                 ></span>
                 <span className="label-sidebar__label-name">{label.name}</span>
               </div>
-              <button className="label-sidebar__delete-btn" onClick={() => {}}>
+              <button
+                className="label-sidebar__delete-btn"
+                onClick={() => deleteLabel(label.id)}
+              >
                 <FiX />
               </button>
             </li>

@@ -5,6 +5,7 @@ interface LabelStore {
   labels: Label[];
   addLabel: (label: Label) => void;
   setLabels: (labels: Label[]) => void;
+  removeLabel: (id: string) => void;
 }
 
 export const useLabelStore = create<LabelStore>((set, get) => ({
@@ -14,5 +15,8 @@ export const useLabelStore = create<LabelStore>((set, get) => ({
   },
   setLabels: (labels: Label[]) => {
     set({ labels });
+  },
+  removeLabel: (id: string) => {
+    set({ labels: get().labels.filter((label) => label.id !== id) });
   },
 }));
