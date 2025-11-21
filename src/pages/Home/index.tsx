@@ -5,9 +5,26 @@ import NoteCard from "./NoteCard";
 import "./Home.css";
 import { useCurrentUserStore } from "../../modules/auth/current-user.store";
 import { Navigate } from "react-router-dom";
+import { useState } from "react";
+import NoteModal from "./NoteModal";
+import { useUIStore } from "../../modules/ui/ui.store";
+import { useNoteStore } from "../../modules/notes/note.store";
+import { noteRepository } from "../../modules/notes/note.repository";
 
 export default function Home() {
   const { currentUser } = useCurrentUserStore();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { addFlashMessage } = useUIStore();
+  const { addNote } = useNoteStore();
+  const createdNote = async (params: SaveNoteParams) => {
+    try {
+      const newNote = await noteRepository.createNote(params);
+      addNote(newNote);
+      addFlashMessage("メモを作成しました", "success");
+    } catch (error) {
+      console.error("メモを作成しました", error);
+    }
+  };
 
   if (!currentUser) return <Navigate to="/login" />;
   return (
@@ -45,7 +62,7 @@ export default function Home() {
             <h2 className="home-content__title">すべてのメモ</h2>
             <button
               className="btn btn-primary home-content__add-btn"
-              onClick={() => {}}
+              onClick={() => setIsModalOpen(true)}
             >
               <FiPlus />
               <span>新しいメモ</span>
@@ -74,6 +91,7 @@ export default function Home() {
           </div> */}
         </main>
       </div>
+      {isModalOpen && <NoteModal />}
     </div>
   );
 }
