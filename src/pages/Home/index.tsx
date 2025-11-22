@@ -16,14 +16,20 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { addFlashMessage } = useUIStore();
   const { addNote } = useNoteStore();
+
   const createdNote = async (params: SaveNoteParams) => {
     try {
       const newNote = await noteRepository.createNote(params);
       addNote(newNote);
       addFlashMessage("メモを作成しました", "success");
     } catch (error) {
-      console.error("メモを作成しました", error);
+      console.error(error);
+      addFlashMessage("メモの作成に失敗しました", "error");
     }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   if (!currentUser) return <Navigate to="/login" />;
