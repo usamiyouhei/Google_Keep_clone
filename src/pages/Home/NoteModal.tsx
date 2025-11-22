@@ -1,5 +1,5 @@
 import { FiX, FiImage, FiTag, FiCheck } from "react-icons/fi";
-import type { Params } from "react-router-dom";
+// import type { Params } from "react-router-dom";
 import type { SaveNoteParams } from "../../modules/notes/note.repository";
 import { useLabelStore } from "../../modules/labels/label.store";
 import { useState } from "react";
@@ -23,11 +23,11 @@ export default function NoteModal({ onClose, onSubmit }: NoteModalProps) {
   };
 
   return (
-    <div className="note-modal-overlay" onClick={() => {}}>
+    <div className="note-modal-overlay" onClick={onClose}>
       <div className="note-modal" onClick={(e) => e.stopPropagation()}>
         <div className="note-modal__header">
           <h2 className="note-modal__title">メモを入力</h2>
-          <button className="icon-btn note-modal__close-btn" onClick={() => {}}>
+          <button className="icon-btn note-modal__close-btn" onClick={onClose}>
             <FiX />
           </button>
         </div>
@@ -125,10 +125,15 @@ export default function NoteModal({ onClose, onSubmit }: NoteModalProps) {
         </div>
 
         <div className="note-modal__footer">
-          <button className="btn btn-secondary" onClick={() => {}}>
+          <button className="btn btn-secondary" onClick={onClose}>
             キャンセル
           </button>
-          <button className="btn btn-primary" onClick={() => {}}>
+          <button
+            className="btn btn-primary"
+            onClick={() =>
+              onSubmit({ title, content, labelIds: selectedLabelIds })
+            }
+          >
             保存
           </button>
         </div>
