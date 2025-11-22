@@ -9,7 +9,10 @@ import { useState } from "react";
 import NoteModal from "./NoteModal";
 import { useUIStore } from "../../modules/ui/ui.store";
 import { useNoteStore } from "../../modules/notes/note.store";
-import { noteRepository } from "../../modules/notes/note.repository";
+import {
+  noteRepository,
+  type SaveNoteParams,
+} from "../../modules/notes/note.repository";
 
 export default function Home() {
   const { currentUser } = useCurrentUserStore();
@@ -97,7 +100,7 @@ export default function Home() {
           </div> */}
         </main>
       </div>
-      {isModalOpen && <NoteModal />}
+      {isModalOpen && <NoteModal onClose={closeModal} onSubmit={createdNote} />}
     </div>
   );
 }
