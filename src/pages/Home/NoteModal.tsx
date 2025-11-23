@@ -3,6 +3,7 @@ import { FiX, FiImage, FiTag, FiCheck } from "react-icons/fi";
 import type { SaveNoteParams } from "../../modules/notes/note.repository";
 import { useLabelStore } from "../../modules/labels/label.store";
 import { useState } from "react";
+import { useUIStore } from "../../modules/ui/ui.store";
 
 interface NoteModalProps {
   onClose: () => void;
@@ -13,6 +14,9 @@ export default function NoteModal({ onClose, onSubmit }: NoteModalProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [selectedLabelIds, setSelectedLabelIds] = useState<string[]>([]);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const { addFlashMessage } = useUIStore();
 
   const toggleLabel = (labelId: string) => {
     if (selectedLabelIds.includes(labelId)) {
@@ -20,6 +24,34 @@ export default function NoteModal({ onClose, onSubmit }: NoteModalProps) {
     } else {
       setSelectedLabelIds((prev) => [...prev, labelId]);
     }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ["image/jpeg", "image/png"];
+    if (!allowedTypes.includes(file.type)) {
+      addFlashMessage("画像ファイルはJPEG、PNGのみ対応しています", "error");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      addFlashMessage("ファイルサイズは5MB以下にしてください", "error");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result as string);
+      setImageFile(file);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemovePreview = () => {
+    setPreviewUrl(null);
+    setImageFile(null);
   };
 
   return (
@@ -93,33 +125,32 @@ export default function NoteModal({ onClose, onSubmit }: NoteModalProps) {
               画像（1枚まで）
             </label>
             <div className="note-modal__images">
-              {/* 画像プレビュー表示バージョン - コメントアウトを切り替えて使用 */}
-              {/* <div className='note-modal__image-preview'>
-                <img
-                  src='https://picsum.photos/400/300'
-                  alt='プレビュー'
-                  className='note-modal__image'
-                />
-                <button
-                  className='note-modal__image-remove'
-                  onClick={() => {}}
-                >
-                  <FiX />
-                </button>
-              </div> */}
-
-              {/* 画像アップロードボタン表示バージョン */}
-              <label className="note-modal__upload-btn">
-                <FiImage />
-                <span>画像をアップロード</span>
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/gif"
-                  onChange={() => {}}
-                  style={{ display: "none" }}
-                  disabled
-                />
-              </label>
+              {previewUrl ? (
+                <div className="note-modal__image-preview">
+                  <img
+                    src={previewUrl}
+                    alt="プレビュー"
+                    className="note-modal__image"
+                  />
+                  <button
+                    className="note-modal__image-remove"
+                    onClick={handleRemovePreview}
+                  >
+                    <FiX />
+                  </button>
+                </div>
+              ) : (
+                <label className="note-modal__upload-btn">
+                  <FiImage />
+                  <span>画像をアップロード</span>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif"
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                  />
+                </label>
+              )}
             </div>
           </div>
         </div>
@@ -131,7 +162,12 @@ export default function NoteModal({ onClose, onSubmit }: NoteModalProps) {
           <button
             className="btn btn-primary"
             onClick={() =>
-              onSubmit({ title, content, labelIds: selectedLabelIds })
+              onSubmit({
+                title,
+                content,
+                labelIds: selectedLabelIds,
+                imageFile: imageFile || undefined,
+              })
             }
           >
             保存
