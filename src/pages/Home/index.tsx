@@ -13,12 +13,14 @@ import {
   noteRepository,
   type SaveNoteParams,
 } from "../../modules/notes/note.repository";
+import type { Note } from "../../modules/notes/note.entity";
 
 export default function Home() {
   const { currentUser } = useCurrentUserStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { addFlashMessage } = useUIStore();
   const { addNote, notes, setNotes, isLoading, setIsLoading } = useNoteStore();
+  const [editingNote, setEditingNote] = useState<Note | null>(null);
 
   useEffect(() => {
     fetchNotes();
@@ -50,7 +52,13 @@ export default function Home() {
     }
   };
 
+  const handleCardClick = (note: Note) => {
+    setEditingNote(note);
+    setIsModalOpen(true);
+  };
+
   const closeModal = () => {
+    setEditingNote(null);
     setIsModalOpen(false);
   };
 
@@ -100,7 +108,7 @@ export default function Home() {
           {/* メモ一覧 - NoteCardコンポーネントを使用 */}
           <div className="notes-grid">
             {notes.map((note) => (
-              <NoteCard key={note.id} note={note} />
+              <NoteCard key={note.id} note={note} onEdit={handleCardClick} />
             ))}
           </div>
 
