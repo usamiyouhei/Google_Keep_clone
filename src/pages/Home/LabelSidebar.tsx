@@ -4,11 +4,13 @@ import LabelModal from "../../components/LabelModal";
 import { useUIStore } from "../../modules/ui/ui.store";
 import { labelRepository } from "../../modules/labels/label.repository";
 import { useLabelStore } from "../../modules/labels/label.store";
+import { useNoteStore } from "../../modules/notes/note.store";
 
 export default function LabelSidebar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { addFlashMessage } = useUIStore();
   const { addLabel, setLabels, labels, removeLabel } = useLabelStore();
+  const { removeLabelFromNotes } = useNoteStore();
 
   useEffect(() => {
     fetchLabels();
@@ -40,6 +42,7 @@ export default function LabelSidebar() {
     try {
       await labelRepository.deleteLabel(labelId);
       removeLabel(labelId);
+      removeLabelFromNotes(labelId);
       addFlashMessage("ラベルを削除しました", "success");
     } catch (error) {
       console.error(error);
