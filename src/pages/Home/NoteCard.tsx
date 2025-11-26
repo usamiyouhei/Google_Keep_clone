@@ -3,11 +3,12 @@ import type { Note } from "../../modules/notes/note.entity";
 
 interface NoteCardProps {
   note: Note;
+  onEdit: (note: Note) => void;
 }
 
-export default function NoteCard({ note }: NoteCardProps) {
+export default function NoteCard({ note, onEdit }: NoteCardProps) {
   return (
-    <div className="note-card">
+    <div className="note-card" onClick={() => onEdit(note)}>
       {note.imageUrl && (
         <div className="note-card__image-container">
           <img
