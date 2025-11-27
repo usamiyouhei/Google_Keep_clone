@@ -4,9 +4,14 @@ import type { Note } from "../../modules/notes/note.entity";
 interface NoteCardProps {
   note: Note;
   onEdit: (note: Note) => void;
+  onDelete: (id: string) => void;
 }
 
-export default function NoteCard({ note, onEdit }: NoteCardProps) {
+export default function NoteCard({ note, onEdit, onDelete }: NoteCardProps) {
+  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    onDelete(note.id);
+  };
   return (
     <div className="note-card" onClick={() => onEdit(note)}>
       {note.imageUrl && (
@@ -36,10 +41,16 @@ export default function NoteCard({ note, onEdit }: NoteCardProps) {
           {note.createdAt.toLocaleString()}
         </span>
         <div className="note-card__actions">
-          <button className="icon-btn note-card__action-btn">
+          <button
+            className="icon-btn note-card__action-btn"
+            onClick={() => onEdit(note)}
+          >
             <FiEdit2 />
           </button>
-          <button className="icon-btn note-card__action-btn" onClick={() => {}}>
+          <button
+            className="icon-btn note-card__action-btn"
+            onClick={handleDelete}
+          >
             <FiTrash2 />
           </button>
         </div>

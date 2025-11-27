@@ -57,4 +57,7 @@ export const noteRepository = {
     });
     return new Note(result.data);
   },
+  async deleteNote(id: string): Promise<void> {
+    await api.delete(`/notes/${id}`);
+  },
 };
