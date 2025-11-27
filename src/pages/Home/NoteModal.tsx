@@ -4,16 +4,20 @@ import type { SaveNoteParams } from "../../modules/notes/note.repository";
 import { useLabelStore } from "../../modules/labels/label.store";
 import { useState } from "react";
 import { useUIStore } from "../../modules/ui/ui.store";
+import type { Note } from "../../modules/notes/note.entity";
 
 interface NoteModalProps {
   onClose: () => void;
   onSubmit: (params: SaveNoteParams) => Promise<void>;
+  note?: Note;
 }
-export default function NoteModal({ onClose, onSubmit }: NoteModalProps) {
+export default function NoteModal({ onClose, onSubmit, note }: NoteModalProps) {
   const { labels } = useLabelStore();
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [selectedLabelIds, setSelectedLabelIds] = useState<string[]>([]);
+  const [title, setTitle] = useState(note?.title || "");
+  const [content, setContent] = useState(note?.content || "");
+  const [selectedLabelIds, setSelectedLabelIds] = useState<string[]>(
+    note?.labels.map((label) => label.id) || []
+  );
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const { addFlashMessage } = useUIStore();

@@ -19,7 +19,8 @@ export default function Home() {
   const { currentUser } = useCurrentUserStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { addFlashMessage } = useUIStore();
-  const { addNote, notes, setNotes, isLoading, setIsLoading } = useNoteStore();
+  const { addNote, notes, setNotes, isLoading, setIsLoading, replaceNote } =
+    useNoteStore();
   const [editingNote, setEditingNote] = useState<Note | null>(null);
 
   useEffect(() => {
@@ -60,6 +61,24 @@ export default function Home() {
   const closeModal = () => {
     setEditingNote(null);
     setIsModalOpen(false);
+  };
+
+  const updateNote = async (params: SaveNoteParams) => {
+    if (!editingNote) return;
+
+    try {
+      const updatedNote = await noteRepository.updateNote(
+        editingNote.id,
+        params
+      );
+      replaceNote(editingNote.id, updatedNote);
+      addFlashMessage("メモを更新しました", "success");
+      setEditingNote(null);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error(error);
+      addFlashMessage("メモの更新に失敗しました", "error");
+    }
   };
 
   if (!currentUser) return <Navigate to="/login" />;
@@ -126,7 +145,13 @@ export default function Home() {
           </div> */}
         </main>
       </div>
-      {isModalOpen && <NoteModal onClose={closeModal} onSubmit={createdNote} />}
+      {isModalOpen && (
+        <NoteModal
+          onClose={closeModal}
+          onSubmit={editingNote ? updateNote : createdNote}
+          note={editingNote || undefined}
+        />
+      )}
     </div>
   );
 }
