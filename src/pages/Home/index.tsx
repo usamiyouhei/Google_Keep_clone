@@ -5,7 +5,7 @@ import NoteCard from "./NoteCard";
 import "./Home.css";
 import { useCurrentUserStore } from "../../modules/auth/current-user.store";
 import { Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import NoteModal from "./NoteModal";
 import { useUIStore } from "../../modules/ui/ui.store";
 import { useNoteStore } from "../../modules/notes/note.store";
@@ -36,6 +36,7 @@ export default function Home() {
   } = useNoteStore();
   const limit = 12;
   const [editingNote, setEditingNote] = useState<Note | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     fetchNotes();
@@ -117,6 +118,24 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      const target = entries[0];
+      if (target.isIntersecting && hasMore && !isLoading) {
+        fetchNotes();
+      }
+    });
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (observer) {
+        observer.disconnect();
+      }
+    };
+  }, [hasMore, isLoading]);
+
   if (!currentUser) return <Navigate to="/login" />;
   return (
     <div className="home">
@@ -171,14 +190,24 @@ export default function Home() {
               />
             ))}
           </div>
+          <div ref={loadMoreRef} style={{ height: "20px" }} />
 
-          {/* <div className='loading' style={{ textAlign: 'center', padding: '20px' }}>
-            読み込み中...
-          </div> */}
-
-          {/* <div className='no-more' style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
-            全てのメモを表示しました
-          </div> */}
+          {isLoading && (
+            <div
+              className="loading"
+              style={{ textAlign: "center", padding: "20px" }}
+            >
+              読み込み中...
+            </div>
+          )}
+          {!hasMore && notes.length > 0 && (
+            <div
+              className="no-more"
+              style={{ textAlign: "center", padding: "20px", color: "#666" }}
+            >
+              全てのメモを表示しました
+            </div>
+          )}
 
           {/* <div className='no-notes'>
             <p>メモがありません</p>
