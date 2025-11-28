@@ -34,8 +34,14 @@ export const noteRepository = {
     });
     return new Note(result.data);
   },
-  async getNotes(page: number = 1, limit: number = 12): Promise<NotesResponse> {
-    const result = await api.get("/notes", { params: { page, limit } });
+  async getNotes(
+    page: number = 1,
+    limit: number = 12,
+    query?: string
+  ): Promise<NotesResponse> {
+    const result = await api.get("/notes", {
+      params: { page, limit, q: query },
+    });
     return {
       notes: result.data.notes.map((note: Note) => new Note(note)),
       pagination: result.data.pagination,
