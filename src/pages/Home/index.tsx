@@ -19,21 +19,44 @@ export default function Home() {
   const { currentUser } = useCurrentUserStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { addFlashMessage } = useUIStore();
-  const { addNote, notes, setNotes, isLoading, setIsLoading, replaceNote } =
-    useNoteStore();
+  const {
+    addNote,
+    notes,
+    setNotes,
+    isLoading,
+    setIsLoading,
+    replaceNote,
+    removeNote,
+    addNotes,
+    resetNotes,
+    page,
+    hasMore,
+    setPage,
+    setHasMore,
+  } = useNoteStore();
+  const limit = 12;
   const [editingNote, setEditingNote] = useState<Note | null>(null);
 
   useEffect(() => {
     fetchNotes();
+    return () => {
+      resetNotes();
+    };
   }, []);
 
   const fetchNotes = async () => {
-    if (isLoading) return;
+    if (isLoading || !hasMore) return;
 
     setIsLoading(true);
     try {
-      const response = await noteRepository.getNotes();
-      setNotes(response.notes);
+      const response = await noteRepository.getNotes(page, limit);
+      if (page === 1) {
+        setNotes(response.notes);
+      } else {
+        addNotes(response.notes);
+      }
+      setPage(page + 1);
+      setHasMore(response.pagination.page < response.pagination.totalPages);
     } catch (error) {
       console.error(error);
       addFlashMessage("メモの取得に失敗しました", "error");
@@ -78,6 +101,19 @@ export default function Home() {
     } catch (error) {
       console.error(error);
       addFlashMessage("メモの更新に失敗しました", "error");
+    }
+  };
+
+  const deleteNote = async (id: string) => {
+    if (!window.confirm("このメモを削除しますか？")) return;
+
+    try {
+      await noteRepository.deleteNote(id);
+      removeNote(id);
+      addFlashMessage("メモを削除しました", "success");
+    } catch (error) {
+      console.error(error);
+      addFlashMessage("メモの削除に失敗しました", "error");
     }
   };
 
@@ -127,7 +163,12 @@ export default function Home() {
           {/* メモ一覧 - NoteCardコンポーネントを使用 */}
           <div className="notes-grid">
             {notes.map((note) => (
-              <NoteCard key={note.id} note={note} onEdit={handleCardClick} />
+              <NoteCard
+                key={note.id}
+                note={note}
+                onEdit={handleCardClick}
+                onDelete={deleteNote}
+              />
             ))}
           </div>
 

@@ -18,7 +18,9 @@ export default function NoteModal({ onClose, onSubmit, note }: NoteModalProps) {
   const [selectedLabelIds, setSelectedLabelIds] = useState<string[]>(
     note?.labels.map((label) => label.id) || []
   );
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    note?.imageUrl || null
+  );
   const [imageFile, setImageFile] = useState<File | null>(null);
   const { addFlashMessage } = useUIStore();
 
