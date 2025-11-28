@@ -14,6 +14,7 @@ import {
   type SaveNoteParams,
 } from "../../modules/notes/note.repository";
 import type { Note } from "../../modules/notes/note.entity";
+import { useDebouncedCallback } from "use-debounce";
 
 export default function Home() {
   const { currentUser } = useCurrentUserStore();
@@ -33,6 +34,8 @@ export default function Home() {
     hasMore,
     setPage,
     setHasMore,
+    searchQuery,
+    setSearchQuery,
   } = useNoteStore();
   const limit = 12;
   const [editingNote, setEditingNote] = useState<Note | null>(null);
@@ -43,14 +46,14 @@ export default function Home() {
     return () => {
       resetNotes();
     };
-  }, []);
+  }, [searchQuery]);
 
   const fetchNotes = async () => {
     if (isLoading || !hasMore) return;
 
     setIsLoading(true);
     try {
-      const response = await noteRepository.getNotes(page, limit);
+      const response = await noteRepository.getNotes(page, limit, searchQuery);
       if (page === 1) {
         setNotes(response.notes);
       } else {
@@ -118,6 +121,10 @@ export default function Home() {
     }
   };
 
+  const handleSearch = useDebouncedCallback((query: string) => {
+    setSearchQuery(query);
+  }, 500);
+
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       const target = entries[0];
@@ -151,7 +158,7 @@ export default function Home() {
             </svg>
             <span className="home-header__logo-text">Google Keep Clone</span>
           </div>
-          <SearchBar />
+          <SearchBar onSearch={handleSearch} />
         </div>
         <div className="home-header__right">
           <span className="home-header__user">テストユーザー</span>
@@ -209,10 +216,12 @@ export default function Home() {
             </div>
           )}
 
-          {/* <div className='no-notes'>
-            <p>メモがありません</p>
-            <p>新しいメモを作成してみましょう</p>
-          </div> */}
+          {!isLoading && notes.length === 0 && (
+            <div className="no-notes">
+              <p>メモがありません</p>
+              <p>新しいメモを作成してみましょう</p>
+            </div>
+          )}
         </main>
       </div>
       {isModalOpen && (
